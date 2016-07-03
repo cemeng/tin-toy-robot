@@ -128,6 +128,9 @@ RSpec.describe ToyRobot do
       end
 
       it "allos subsequent valid movements after an invalid one" do
+        robot.execute("PLACE 0,0,WEST MOVE") # invalid
+        robot.execute("RIGHT MOVE") # valid, moves north one step
+        expect(robot.y).to eq 1
       end
     end
   end
