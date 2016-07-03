@@ -1,14 +1,13 @@
 # require "toy_robot"
 
 class ToyRobot
-  attr_reader :x, :y, :facing, :commands
+  attr_reader :x, :y, :facing
   BOARD_LENGTH = 5
+  DIRECTIONS = %w(NORTH EAST SOUTH WEST).freeze
 
-  # commands: PLACE, MOVE, LEFF, RIGHT, REPORT
   def execute(commands)
-    @commands = commands.split(" ")
     parsing_place_command = false
-    @commands.each do |command|
+    commands.split(" ").each do |command|
       if parsing_place_command
         execute_place command
         parsing_place_command = false
@@ -21,6 +20,8 @@ class ToyRobot
         execute_move
       when "LEFT", "RIGHT"
         execute_rotate command
+      when "REPORT"
+        return execute_report
       end
     end
   end
@@ -40,8 +41,6 @@ class ToyRobot
     @y = args[1].to_i
     @facing = args[2]
   end
-
-  DIRECTIONS = %w(NORTH EAST SOUTH WEST).freeze
 
   def execute_rotate(direction)
     @facing = case direction
@@ -66,15 +65,19 @@ class ToyRobot
       @y = y_before
     end
   end
+
+  def execute_report
+    "#{@x},#{@y},#{@facing}"
+  end
 end
 
 RSpec.describe ToyRobot do
   let (:robot) { ToyRobot.new }
 
   describe "#execute" do
-    it "should parse commands correctly" do
-      robot.execute("PLACE 0,0,WEST MOVE LEFT RIGHT REPORT")
-      expect(robot.commands.size).to eq 6
+    it "executes the commands correctly" do
+      result = robot.execute("PLACE 0,0,NORTH MOVE REPORT")
+      expect(result).to eq "0,1,NORTH"
     end
   end
 
