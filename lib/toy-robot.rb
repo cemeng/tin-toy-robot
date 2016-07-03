@@ -5,11 +5,13 @@ class ToyRobot
 
   def execute(commands)
     parsing_place_command = false
+
     commands.split(" ").each do |command|
       if parsing_place_command
         execute_place command
         parsing_place_command = false
       end
+
       case command
       when "PLACE"
         parsing_place_command = true
@@ -23,6 +25,8 @@ class ToyRobot
       end
     end
   end
+
+  private
 
   def position_valid?(x:, y:)
     (x >= 0 && y >= 0 && x < BOARD_LENGTH && y < BOARD_LENGTH)
@@ -41,6 +45,7 @@ class ToyRobot
   end
 
   def execute_rotate(direction)
+    return unless robot_placed?
     @facing = case direction
               when "LEFT"
                 DIRECTIONS[DIRECTIONS.find_index(@facing) - 1]
@@ -50,6 +55,7 @@ class ToyRobot
   end
 
   def execute_move
+    return unless robot_placed?
     x_before = @x
     y_before = @y
     case @facing
@@ -65,6 +71,11 @@ class ToyRobot
   end
 
   def execute_report
+    return unless robot_placed?
     "#{@x},#{@y},#{@facing}"
+  end
+
+  def robot_placed?
+    @x && @y && @facing
   end
 end

@@ -4,13 +4,20 @@ RSpec.describe ToyRobot do
   let (:robot) { ToyRobot.new }
 
   describe "#execute" do
-    it "executes the commands correctly" do
+    it "executes the string of commands correctly" do
       result = robot.execute("PLACE 0,0,NORTH MOVE REPORT")
       expect(result).to eq "0,1,NORTH"
+      expect(robot.execute("PLACE 0,0,NORTH LEFT REPORT")).to eq "0,0,WEST"
+      expect(robot.execute("PLACE 1,2,EAST MOVE MOVE LEFT MOVE REPORT")).to eq "3,3,NORTH"
+    end
+
+    it "ignores commands before a place command" do
+      robot.execute("MOVE LEFT RIGHT PLACE 0,0,NORTH")
+      expect(robot.execute("REPORT")).to eq "0,0,NORTH"
     end
   end
 
-  describe "place command" do
+  describe "PLACE command" do
     it "places the robot correctly" do
       robot.execute("PLACE 0,0,WEST")
       expect(robot.x).to eq 0
@@ -20,7 +27,7 @@ RSpec.describe ToyRobot do
   end
 
   describe "LEFT / RIGHT command" do
-    it "rotates robot left 4 times return the robot back to its initial facing direction" do
+    it "rotating left 4 times returns the robot back to its initial facing direction" do
       robot.execute("PLACE 0,0,NORTH")
       robot.execute("LEFT")
       expect(robot.facing).to eq "WEST"
@@ -32,7 +39,7 @@ RSpec.describe ToyRobot do
       expect(robot.facing).to eq "NORTH"
     end
 
-    it "rotates robot right 4 times return the robot back to its initial facing direction" do
+    it "rotating right 4 times returns the robot back to its initial facing direction" do
       robot.execute("PLACE 0,0,NORTH")
       robot.execute("RIGHT")
       expect(robot.facing).to eq "EAST"
@@ -45,32 +52,25 @@ RSpec.describe ToyRobot do
     end
   end
 
-  describe "move command" do
-    it "moves robot" do
+  describe "MOVE command" do
+    it "moves robot north 1 place when robot faces NORTH" do
       robot.execute("PLACE 0,0,NORTH")
       robot.execute("MOVE")
       expect(robot.y).to eq 1
     end
 
-    describe "invalid move" do
+    describe "to an invalid position" do
       it "should not move the robot when the movement results in robot going out of bound" do
         robot.execute("PLACE 0,0,WEST")
         robot.execute("MOVE")
         expect(robot.x).to eq 0
       end
 
-      it "allos subsequent valid movements after an invalid one" do
+      it "allos subsequent valid movements" do
         robot.execute("PLACE 0,0,WEST MOVE") # invalid
         robot.execute("RIGHT MOVE") # valid, moves north one step
         expect(robot.y).to eq 1
       end
     end
   end
-
-  describe "#position_valid?" do
-    it "returns false when current position is greater than board length" do
-      expect(robot.position_valid?(x: 0, y: 5)).to be false
-    end
-  end
 end
-
