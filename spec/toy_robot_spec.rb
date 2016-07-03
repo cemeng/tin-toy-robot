@@ -9,14 +9,16 @@ class ToyRobot
     @commands = commands.split(" ")
     parsing_place_command = false
     @commands.each do |command|
-      if command == "PLACE"
-        parsing_place_command = true
-        next
-      end
       if parsing_place_command
-        raise "Invalid arguments for place command" unless place_command_args_valid?(command)
         execute_place_command command
         parsing_place_command = false
+      end
+      case command
+      when "PLACE"
+        parsing_place_command = true
+        next
+      when "MOVE"
+        execute_move
       end
     end
   end
@@ -30,10 +32,20 @@ class ToyRobot
   end
 
   def execute_place_command(place_args)
+    raise "Invalid arguments for place command" unless place_command_args_valid?(place_args)
     args = place_args.split(",")
     @x = args[0].to_i
     @y = args[1].to_i
     @facing = args[2]
+  end
+
+  def execute_move
+    case @facing
+    when "NORTH" then @y += 1
+    when "SOUTH" then @y -= 1
+    when "EAST" then @x += 1
+    when "WEST" then @x -= 1
+    end
   end
 end
 
@@ -53,6 +65,22 @@ RSpec.describe ToyRobot do
       expect(robot.x).to eq 0
       expect(robot.y).to eq 0
       expect(robot.facing).to eq "WEST"
+    end
+  end
+
+  describe "move command" do
+    it "moves robot" do
+      robot.execute("PLACE 0,0,NORTH")
+      robot.execute("MOVE")
+      expect(robot.y).to eq 1
+    end
+
+    describe "invalid move" do
+      it "should not execute when the resulting movement is going to be out of bound" do
+      end
+
+      it "allos subsequent valid movement" do
+      end
     end
   end
 
