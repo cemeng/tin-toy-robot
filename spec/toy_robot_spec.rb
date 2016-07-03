@@ -24,7 +24,7 @@ class ToyRobot
   end
 
   def position_valid?(x:, y:)
-    (x > 0 && y > 0 && x < BOARD_LENGTH && y < BOARD_LENGTH)
+    (x >= 0 && y >= 0 && x < BOARD_LENGTH && y < BOARD_LENGTH)
   end
 
   def place_command_args_valid?(command_args)
@@ -40,11 +40,17 @@ class ToyRobot
   end
 
   def execute_move
+    x_before = @x
+    y_before = @y
     case @facing
     when "NORTH" then @y += 1
     when "SOUTH" then @y -= 1
     when "EAST" then @x += 1
     when "WEST" then @x -= 1
+    end
+    unless position_valid?(x: @x, y: @y)
+      @x = x_before
+      @y = y_before
     end
   end
 end
@@ -76,10 +82,13 @@ RSpec.describe ToyRobot do
     end
 
     describe "invalid move" do
-      it "should not execute when the resulting movement is going to be out of bound" do
+      it "should not move the robot when the movement results in robot going out of bound" do
+        robot.execute("PLACE 0,0,WEST")
+        robot.execute("MOVE")
+        expect(robot.x).to eq 0
       end
 
-      it "allos subsequent valid movement" do
+      it "allos subsequent valid movements after an invalid one" do
       end
     end
   end
