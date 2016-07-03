@@ -10,7 +10,7 @@ class ToyRobot
     parsing_place_command = false
     @commands.each do |command|
       if parsing_place_command
-        execute_place_command command
+        execute_place command
         parsing_place_command = false
       end
       case command
@@ -19,6 +19,8 @@ class ToyRobot
         next
       when "MOVE"
         execute_move
+      when "LEFT", "RIGHT"
+        execute_rotate command
       end
     end
   end
@@ -31,12 +33,23 @@ class ToyRobot
     command_args =~ /[0-5]{1},[0-5]{1},(WEST|EAST|NORTH|SOUTH)/
   end
 
-  def execute_place_command(place_args)
+  def execute_place(place_args)
     raise "Invalid arguments for place command" unless place_command_args_valid?(place_args)
     args = place_args.split(",")
     @x = args[0].to_i
     @y = args[1].to_i
     @facing = args[2]
+  end
+
+  DIRECTIONS = %w(NORTH EAST SOUTH WEST).freeze
+
+  def execute_rotate(direction)
+    @facing = case direction
+              when "LEFT"
+                DIRECTIONS[DIRECTIONS.find_index(@facing) - 1]
+              when "RIGHT"
+                DIRECTIONS[DIRECTIONS.find_index(@facing) - 3]
+              end
   end
 
   def execute_move
@@ -71,6 +84,32 @@ RSpec.describe ToyRobot do
       expect(robot.x).to eq 0
       expect(robot.y).to eq 0
       expect(robot.facing).to eq "WEST"
+    end
+  end
+
+  describe "LEFT / RIGHT command" do
+    it "rotates robot left 4 times return the robot back to its initial facing direction" do
+      robot.execute("PLACE 0,0,NORTH")
+      robot.execute("LEFT")
+      expect(robot.facing).to eq "WEST"
+      robot.execute("LEFT")
+      expect(robot.facing).to eq "SOUTH"
+      robot.execute("LEFT")
+      expect(robot.facing).to eq "EAST"
+      robot.execute("LEFT")
+      expect(robot.facing).to eq "NORTH"
+    end
+
+    it "rotates robot right 4 times return the robot back to its initial facing direction" do
+      robot.execute("PLACE 0,0,NORTH")
+      robot.execute("RIGHT")
+      expect(robot.facing).to eq "EAST"
+      robot.execute("RIGHT")
+      expect(robot.facing).to eq "SOUTH"
+      robot.execute("RIGHT")
+      expect(robot.facing).to eq "WEST"
+      robot.execute("RIGHT")
+      expect(robot.facing).to eq "NORTH"
     end
   end
 
