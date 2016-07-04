@@ -24,6 +24,7 @@ class ToyRobot
         return execute_report
       end
     end
+    nil # by default returns nil, unless there is report command
   end
 
   private

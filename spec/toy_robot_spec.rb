@@ -1,4 +1,4 @@
-require "toy-robot"
+require "toy_robot"
 
 RSpec.describe ToyRobot do
   let (:robot) { ToyRobot.new }
