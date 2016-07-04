@@ -7,8 +7,6 @@ RSpec.describe ToyRobot do
     it "executes the string of commands correctly" do
       result = robot.execute("PLACE 0,0,NORTH MOVE REPORT")
       expect(result).to eq "0,1,NORTH"
-      expect(robot.execute("PLACE 0,0,NORTH LEFT REPORT")).to eq "0,0,WEST"
-      expect(robot.execute("PLACE 1,2,EAST MOVE MOVE LEFT MOVE REPORT")).to eq "3,3,NORTH"
     end
 
     it "ignores commands before a place command" do

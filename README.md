@@ -25,4 +25,6 @@ ruby toy-robot-runner.rb PLACE 0,0,NORTH MOVE REPORT
 ```
 
 ## Test data
-
+```
+rspec spec/toy_robot_test_data_spec.rb --format documentation
+```
